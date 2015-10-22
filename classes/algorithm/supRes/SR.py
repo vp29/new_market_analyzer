@@ -10,13 +10,13 @@ from classes.algorithm import Algorithm
 
 
 class SR(Algorithm.Algorithm):
-    finished_trades = []
 
     def __init__(self, sim_vars, run_id=0):
         self.type = "SR"
         super(SR, self).__init__(sim_vars, run_id)
 
     def run_algo(self, stock):
+        finished_trades = []
         print "Running SR: %s" % (stock,)
 
         data = Helper.read_file(self.file_loc + stock + self.file_ext)
@@ -32,7 +32,7 @@ class SR(Algorithm.Algorithm):
             close = prices[-1].close
 
             # Check if we can exit trade
-            self.check_exit(trades, prices[-1])
+            finished_trades.extend(self.check_exit(trades, prices[-1]))
 
             # Find least square line of all prices
             inter, slope = Helper.least_square(prices)
@@ -114,10 +114,10 @@ class SR(Algorithm.Algorithm):
             else:
                 short_buffer_zone = False
 
-        return self.finished_trades
+        return finished_trades
 
     def check_exit(self, trades, last_price):
-
+        finished_trades = []
         for trade in trades:
                 trade.data.append(last_price)
                 if trade.trade_type == "long":
@@ -135,7 +135,7 @@ class SR(Algorithm.Algorithm):
                             url = self.plot_trade(trade, trade.symbol + " long stop " + gl + " testing ")
                             trade.exit_url = url
                         if self.sim_vars.database:
-                            self.finished_trades.append(DBTrade(trade.symbol, self.sim_id, trade))
+                            finished_trades.append(DBTrade(trade.symbol, self.sim_id, trade))
                         trades.remove(trade)
                     elif last_price.close > trade.stop_loss_point/(1-self.sim_vars.stopLossPerc/100):
                         trades.remove(trade)
@@ -158,7 +158,7 @@ class SR(Algorithm.Algorithm):
                             url = self.plot_trade(trade, trade.symbol + " short stop " + gl + " testing ")
                             trade.exit_url = url
                         if self.sim_vars.database:
-                            self.finished_trades.append(DBTrade(trade.symbol, self.sim_id, trade))
+                            finished_trades.append(DBTrade(trade.symbol, self.sim_id, trade))
                         trades.remove(trade)
                     elif last_price.close < trade.stop_loss_point/(1+self.sim_vars.stopLossPerc/100):
                         trades.remove(trade)
@@ -166,6 +166,7 @@ class SR(Algorithm.Algorithm):
                         trades.append(trade)
                     else:
                         continue
+        return finished_trades
 
     def trend_least_square(self, prices, diff_vals, cutoff, mult):
         diff = self.find_matches(diff_vals, cutoff, mult)

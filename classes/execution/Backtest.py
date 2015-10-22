@@ -1,7 +1,7 @@
 from multiprocessing import Pool
 import time
 
-from classes.execution import Indicators
+from classes.execution import Indicators, Database
 from classes.models import Simulation
 
 
@@ -58,6 +58,7 @@ class Backtest(object):
 
         print "--- %s seconds to finish runs ---" % (time.time()-start)
 
+        self.db = Database.Database()
         for trades in p:
             if len(trades) > 0:
                 print "Inserting %d %s trades" % (len(trades), trades[0].symbol)
