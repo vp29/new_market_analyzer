@@ -39,7 +39,7 @@ class Plot(object):
         except Exception, e:
             print e
 
-        print unique_url
+        #print unique_url
         return str(unique_url)
 
     def generate_subplots(self, title, plot_data):

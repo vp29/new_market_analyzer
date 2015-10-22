@@ -27,11 +27,12 @@ class Backtest(object):
         self.type = alg.type
         self.alg = alg
 
-        db_vars = Simulation.Simulation(self.type, self.sim_vars)
-        self.db.insert_item(db_vars)
-        self.var_id = db_vars.id
-        self.alg.sim_id = db_vars.id
-        print "Created simulation_id " + str(self.var_id)
+        if alg.sim_vars.database:
+            db_vars = Simulation.Simulation(self.type, self.sim_vars)
+            self.db.insert_item(db_vars)
+            self.var_id = db_vars.id
+            self.alg.sim_id = db_vars.id
+            print "Created simulation_id " + str(self.var_id)
 
     def run(self):
         start = time.time()

@@ -11,6 +11,7 @@ class PlotTrade(Trade.Trade):
     exit_url = None
     sup_line = None
     res_line = None
+    mean_line = None
 
     def __init__(self, trade_type, enter_date, exit_date, enter_price, exit_price, enter_url, exit_url,
                  exit_point, stop_loss_point, data, sup_line, res_line, symbol):
