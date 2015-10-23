@@ -5,7 +5,6 @@ from classes.data import Trade
 # Trade class with extra information for Plotting
 class PlotTrade(Trade.Trade):
     exit_point = None
-    stop_loss_point = None
     data = None
     enter_url = None
     exit_url = None

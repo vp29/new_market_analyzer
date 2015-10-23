@@ -119,53 +119,53 @@ class SR(Algorithm.Algorithm):
     def check_exit(self, trades, last_price):
         finished_trades = []
         for trade in trades:
-                trade.data.append(last_price)
-                if trade.trade_type == "long":
-                    if last_price.close <= trade.stop_loss_point:
-                        trade.exit_price = last_price.close
-                        trade.exit_date = last_price.timestamp
-                        if self.sim_vars.plotting:
-                            trade.res_line.end = len(trade.data)-1
-                            trade.sup_line.end = len(trade.data)-1
-                            trade.mean_line.end = len(trade.data)-1
-                            if trade.enter_price < trade.exit_price:
-                                gl = "gain"
-                            else:
-                                gl = "loss"
-                            url = self.plot_trade(trade, trade.symbol + " long stop " + gl + " testing ")
-                            trade.exit_url = url
-                        if self.sim_vars.database:
-                            finished_trades.append(DBTrade(trade.symbol, self.sim_id, trade))
-                        trades.remove(trade)
-                    elif last_price.close > trade.stop_loss_point/(1-self.sim_vars.stopLossPerc/100):
-                        trades.remove(trade)
-                        trade.stop_loss_point = last_price.close - last_price.close*self.sim_vars.stopLossPerc/100
-                        trades.append(trade)
-                    else:
-                        continue
-                elif trade.trade_type == "short":
-                    if last_price.close >= trade.stop_loss_point:
-                        trade.exit_price = last_price.close
-                        trade.exit_date = last_price.timestamp
-                        if self.sim_vars.plotting:
-                            trade.res_line.end = len(trade.data)-1
-                            trade.sup_line.end = len(trade.data)-1
-                            trade.mean_line.end = len(trade.data)-1
-                            if trade.exit_price < trade.enter_price:
-                                gl = "gain"
-                            else:
-                                gl = "loss"
-                            url = self.plot_trade(trade, trade.symbol + " short stop " + gl + " testing ")
-                            trade.exit_url = url
-                        if self.sim_vars.database:
-                            finished_trades.append(DBTrade(trade.symbol, self.sim_id, trade))
-                        trades.remove(trade)
-                    elif last_price.close < trade.stop_loss_point/(1+self.sim_vars.stopLossPerc/100):
-                        trades.remove(trade)
-                        trade.stop_loss_val = last_price.close + last_price.close*self.sim_vars.stopLossPerc/100
-                        trades.append(trade)
-                    else:
-                        continue
+            trade.data.append(last_price)
+            if trade.trade_type == "long":
+                if last_price.close <= trade.stop_loss_point:
+                    trade.exit_price = last_price.close
+                    trade.exit_date = last_price.timestamp
+                    if self.sim_vars.plotting:
+                        trade.res_line.end = len(trade.data)-1
+                        trade.sup_line.end = len(trade.data)-1
+                        trade.mean_line.end = len(trade.data)-1
+                        if trade.enter_price < trade.exit_price:
+                            gl = "gain"
+                        else:
+                            gl = "loss"
+                        url = self.plot_trade(trade, trade.symbol + " long stop " + gl + " testing ")
+                        trade.exit_url = url
+                    if self.sim_vars.database:
+                        finished_trades.append(DBTrade(trade.symbol, self.sim_id, trade))
+                    trades.remove(trade)
+                elif last_price.close > trade.stop_loss_point/(1-self.sim_vars.stopLossPerc/100):
+                    trades.remove(trade)
+                    trade.stop_loss_point = last_price.close - last_price.close*self.sim_vars.stopLossPerc/100
+                    trades.append(trade)
+                else:
+                    continue
+            elif trade.trade_type == "short":
+                if last_price.close >= trade.stop_loss_point:
+                    trade.exit_price = last_price.close
+                    trade.exit_date = last_price.timestamp
+                    if self.sim_vars.plotting:
+                        trade.res_line.end = len(trade.data)-1
+                        trade.sup_line.end = len(trade.data)-1
+                        trade.mean_line.end = len(trade.data)-1
+                        if trade.exit_price < trade.enter_price:
+                            gl = "gain"
+                        else:
+                            gl = "loss"
+                        url = self.plot_trade(trade, trade.symbol + " short stop " + gl + " testing ")
+                        trade.exit_url = url
+                    if self.sim_vars.database:
+                        finished_trades.append(DBTrade(trade.symbol, self.sim_id, trade))
+                    trades.remove(trade)
+                elif last_price.close < trade.stop_loss_point/(1+self.sim_vars.stopLossPerc/100):
+                    trades.remove(trade)
+                    trade.stop_loss_point = last_price.close + last_price.close*self.sim_vars.stopLossPerc/100
+                    trades.append(trade)
+                else:
+                    continue
         return finished_trades
 
     def trend_least_square(self, prices, diff_vals, cutoff, mult):
@@ -199,7 +199,7 @@ class SR(Algorithm.Algorithm):
         x_vals = [i for i in range(0, len(trade.data)-1)]
         plot_data = []
         plot_data.append(self.plot.gen_line(line.x, line.y, 'Stock Data'))
-        plot_data.append(self.plot.gen_line(x_vals, len(x_vals)*[trade.exit_price], 'Exit Point', 1, 'dash'))
+        plot_data.append(self.plot.gen_line(x_vals, len(x_vals)*[trade.exit_point], 'Exit Point', 1, 'dash'))
         plot_data.append(self.plot.gen_line(x_vals, len(x_vals)*[trade.stop_loss_point], 'Stop Loss Point', 1, 'dash'))
         plot_data.append(self.plot.gen_line(x_vals, trade.res_line.get_values(), 'Resistance Line'))
         plot_data.append(self.plot.gen_line(x_vals, trade.sup_line.get_values(), 'Support Line'))
