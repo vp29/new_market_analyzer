@@ -5,6 +5,7 @@ import traceback
 from classes.execution.Helper import Helper
 from classes.data.Line import Straight, Scatter
 from classes.data.PlotTrade import PlotTrade
+from classes.data.Split import Split
 from classes.models.DBTrade import DBTrade
 from classes.algorithm import Algorithm
 
@@ -18,8 +19,14 @@ class SR(Algorithm.Algorithm):
     def run_algo(self, stock):
         finished_trades = []
         print "Running SR: %s" % (stock,)
+        splits = []
 
-        data = Helper.read_file(self.file_loc + stock + self.file_ext)
+        data = Helper.read_data_file(self.data_file_loc + stock + self.data_file_ext)
+        # Not all stocks have split data
+        try:
+            splits = Helper.read_split_file(self.split_file_loc + stock + self.split_file_ext)
+        except:
+            None
 
         trades = []
         short_buffer_zone = False
@@ -31,8 +38,13 @@ class SR(Algorithm.Algorithm):
                 prices[j].index = j
             close = prices[-1].close
 
+            cur_split = Split(1.0, 0)
+            for split in splits:
+                if split.timestamp < prices[-1].timestamp < (split.timestamp + 86400):
+                    cur_split = split
+
             # Check if we can exit trade
-            finished_trades.extend(self.check_exit(trades, prices[-1]))
+            finished_trades.extend(self.check_exit(trades, prices[-1], cur_split))
 
             # Find least square line of all prices
             inter, slope = Helper.least_square(prices)
@@ -116,9 +128,13 @@ class SR(Algorithm.Algorithm):
 
         return finished_trades
 
-    def check_exit(self, trades, last_price):
+    def check_exit(self, trades, last_price, split):
         finished_trades = []
         for trade in trades:
+            if trade.last_split < split.timestamp:
+                trade.last_split = split.timestamp
+                trade.split_mult *= split.ratio
+            last_price.close *= trade.split_mult
             trade.data.append(last_price)
             if trade.trade_type == "long":
                 if last_price.close <= trade.stop_loss_point:
@@ -137,7 +153,7 @@ class SR(Algorithm.Algorithm):
                     if self.sim_vars.database:
                         finished_trades.append(DBTrade(trade.symbol, self.sim_id, trade))
                     trades.remove(trade)
-                elif last_price.close > trade.stop_loss_point/(1-self.sim_vars.stopLossPerc/100):
+                elif last_price.close > trade.stop_loss_point/(1-self.sim_vars.stopLossPerc/100.0):
                     trades.remove(trade)
                     trade.stop_loss_point = last_price.close - last_price.close*self.sim_vars.stopLossPerc/100
                     trades.append(trade)
@@ -160,9 +176,9 @@ class SR(Algorithm.Algorithm):
                     if self.sim_vars.database:
                         finished_trades.append(DBTrade(trade.symbol, self.sim_id, trade))
                     trades.remove(trade)
-                elif last_price.close < trade.stop_loss_point/(1+self.sim_vars.stopLossPerc/100):
+                elif last_price.close < trade.stop_loss_point/(1+self.sim_vars.stopLossPerc/100.0):
                     trades.remove(trade)
-                    trade.stop_loss_point = last_price.close + last_price.close*self.sim_vars.stopLossPerc/100
+                    trade.stop_loss_point = last_price.close + last_price.close*self.sim_vars.stopLossPerc/100.0
                     trades.append(trade)
                 else:
                     continue

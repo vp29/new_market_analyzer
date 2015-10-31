@@ -5,6 +5,7 @@ class Data:
     high = 0.0
     low = 0.0
     close = 0.0
+    adj_close = 0.0
     volume = 0.0
     timestamp = 0
 

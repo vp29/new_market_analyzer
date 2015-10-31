@@ -6,6 +6,7 @@ import time
 from datetime import datetime
 
 from classes.data.Data import Data
+from classes.data.Split import Split
 from classes.data.Line import Straight
 
 
@@ -51,7 +52,7 @@ class Helper:
         return a, b
 
     @staticmethod
-    def read_file(filename):
+    def read_data_file(filename):
         print filename
         data = []
         with open(filename, 'rb') as csvfile:
@@ -65,13 +66,25 @@ class Helper:
                 if i % 5 == 0:
                     try:
                         data_val = Data(float(row[3]), float(row[1]), float(row[2]), float(row[4]), int(row[5]), time.mktime(datetime.strptime(row[0], "%Y-%m-%d %H:%M:%S").timetuple()))
-                        data.append(data_val)
+                        if data_val.low <= data_val.close <= data_val.high:
+                            data.append(data_val)
                     except:
                         None
                         #print "Cannot parse line: " + row
                 i += 1
 
         return data
+
+    @staticmethod
+    def read_split_file(filename):
+        splits = []
+        with open(filename, 'rb') as csvfile:
+            spamreader = csv.reader(csvfile, delimiter=',', quotechar='|')
+            for row in spamreader:
+                split = Split(float(row[1]), int(float(row[0])))
+                splits.append(split)
+
+        return splits
 
     '''@staticmethod
     def trend_type(res_line, sup_line, next_index, sup_per, res_per, curPrice, resRange, supRange):

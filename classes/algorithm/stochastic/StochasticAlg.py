@@ -44,7 +44,7 @@ class StochasticAlg(Algorithm.Algorithm):
             trades = []
 
             # Read data in
-            data = Helper.read_file(self.file_loc + stock + self.file_ext)
+            data = Helper.read_data_file(self.data_file_loc + stock + self.data_file_ext)
 
             for i in range(0, len(data) - long_mov_avg_range, 1):
                 prices = data[i: i+long_mov_avg_range+1]

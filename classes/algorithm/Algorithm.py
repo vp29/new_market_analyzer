@@ -14,8 +14,10 @@ class Algorithm(object):
     run_id = None
     type = None
 
-    file_loc = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe()))) + '\..\..\data\sandp\\'
-    file_ext = '-20050101 075000-60sec.csv'
+    data_file_loc = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe()))) + '\..\..\data\sandp\\'
+    data_file_ext = '-20050101 075000-60sec.csv'
+    split_file_loc = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe()))) + '\..\..\data\splits\\'
+    split_file_ext = '_splits.csv'
 
     def __init__(self, sim_vars, run_id=0):
         self.sim_vars = sim_vars
