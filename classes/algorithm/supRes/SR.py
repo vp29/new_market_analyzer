@@ -82,8 +82,8 @@ class SR(Algorithm.Algorithm):
                 buy_point, sell_point, pot_buy, actual_type = Helper.trendType(res_least_square.slope,
                                                                   sup_least_square.slope, res_least_square.intercept,
                                                                   sup_least_square.intercept,
-                                                                  self.sim_vars.analysisRange, self.sim_vars.supMinBuyPer/100,
-                                                                  self.sim_vars.resMinBuyPer/100, close,
+                                                                  self.sim_vars.analysisRange, self.sim_vars.supMinBuyPer/100.0,
+                                                                  self.sim_vars.resMinBuyPer/100.0, close,
                                                                   self.sim_vars.analysisRange-1, self.sim_vars.analysisRange-1)
 
                 #only consider buying when support matches in middle and at least one side
@@ -91,16 +91,16 @@ class SR(Algorithm.Algorithm):
                     and (pos_matches[1] and (pos_matches[0] and pos_matches[2]))
                 short_pot_buy = long_pot_buy
 
-                if self.sim_vars.longStocks and long_buffer_zone and sell_point > close*(1.0 + self.sim_vars.minimumPercent/100) and long_pot_buy:
+                if self.sim_vars.longStocks and long_buffer_zone and sell_point > close*(1.0 + self.sim_vars.minimumPercent/100.0) and long_pot_buy:
                     if min_long_buy_point <= close <= max_long_buy_point:
 
                         long_buffer_zone = False
 
                         t = PlotTrade("long", prices[-1].timestamp, None, close, None, None, None, sell_point,
-                            close - close*self.sim_vars.stopLossPerc/100, prices, sup_least_square, res_least_square, stock)
+                            close - close*self.sim_vars.stopLossPerc/100.0, prices, sup_least_square, res_least_square, stock)
                         t.mean_line = mean_least_square
                         trades.append(t)
-                elif self.sim_vars.shortStocks and short_buffer_zone and buy_point < close/(1.0 + self.sim_vars.minimumPercent/100) and short_pot_buy:
+                elif self.sim_vars.shortStocks and short_buffer_zone and buy_point < close/(1.0 + self.sim_vars.minimumPercent/100.0) and short_pot_buy:
                     if min_short_sell_point <= close <= max_short_sell_point:
 
                         short_buffer_zone = False
@@ -112,14 +112,14 @@ class SR(Algorithm.Algorithm):
 
             # We only want to allow trades if we go below a buffer zone
             # Check if within buffer zone
-            if sup_val + (res_val-sup_val)*(self.sim_vars.bufferPercent/100) >= close:
+            if sup_val + (res_val-sup_val)*(self.sim_vars.bufferPercent/100.0) >= close:
                 long_buffer_zone = True
             elif close < min_long_buy_point and long_buffer_zone:
                 long_buffer_zone = True
             else:
                 long_buffer_zone = False
 
-            if res_val - (res_val-sup_val)*(self.sim_vars.bufferPercent/100) <= close:
+            if res_val - (res_val-sup_val)*(self.sim_vars.bufferPercent/100.0) <= close:
                 short_buffer_zone = True
             elif close > max_short_sell_point and short_buffer_zone:
                 short_buffer_zone = True

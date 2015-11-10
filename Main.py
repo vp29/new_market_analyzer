@@ -36,8 +36,11 @@ if __name__ == '__main__':
 
     db = Database()
 
-    for sl in stop_loss_list:
+    '''for sl in stop_loss_list:
         for min_gain in min_gain_list:
+            if sl < 3 or (sl == 3 and min_gain < 5):
+                continue
+            db = Database()
             var = Variables.Variables()
             var.stopLossPerc = sl
             var.minimumPercent = min_gain
@@ -48,8 +51,8 @@ if __name__ == '__main__':
             stoch = SR(var)
             stoch_back = Backtest(db, stock_list, stoch)
             stoch_back.run_pool()
-            #cProfile.run('stoch_back.run()', 'foo.profile')
+            #cProfile.run('stoch_back.run()', 'foo.profile')'''
 
-    '''analyze = Analyze(213, db)
+    analyze = Analyze(265, db)
 
-    analyze.analyze_db(15000)'''
+    analyze.analyze_db(15000)
